@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Batch GPA Dashboard</title>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #222;
+    }
+
+    h2 {
+      color: #000;
+    }
+
+    button {
+      padding: 8px 16px;
+      background-color: #000;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    button:hover {
+      background-color: #333;
+    }
+
+    .selector {
+      display: inline-block;
+      margin-right: 10px;
+      cursor: pointer;
+      color: #000;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+
+    .selector:hover {
+      color: #444;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background-color: #000;
+      color: white;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Batch Wise Semester GPA Dashboard</h1>
+  </header>
+
+  <div x-data="App()">
+    <!-- Load Data Button -->
+    <button @click="loadAllData">Load Data For All Batches</button>
+
+    <!-- Year Selection -->
+    <div>
+      <h2>Select Year:</h2>
+      <template x-for="year in allYears" :key="year">
+        <a class="selector" @click.prevent="selectYear(year)" x-text="year"></a>
+      </template>
+    </div>
+
+    <!-- Semester Selection -->
+    <template x-if="selectedBatchYear">
+      <div style="margin-top: 15px;">
+        <h2>
+          Select Semester for <span x-text="selectedBatchYear"></span>:
+        </h2>
+        <a class="selector" @click.prevent="selectSemester('Fall')">Fall</a>
+        <a class="selector" @click.prevent="selectSemester('Spring')">Spring</a>
+        <a class="selector" @click.prevent="selectSemester('Summer')">Summer</a>
+      </div>
+    </template>
+
+    <!-- Loading and Error Messages -->
+    <div x-show="loading" class="message">Loading data...</div>
+    <div x-show="error" x-text="error" class="message" style="color: red;"></div>
+
+    <!-- GPA Table -->
+    <table x-show="batchGpaData.length > 0">
+      <thead>
+        <tr>
+          <th>Batch Year</th>
+          <th>Semester</th>
+          <th>Average GPA</th>
+          <th>Total Students</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="item in batchGpaData" :key="`${item.batch_year}-${item.semester}`">
+          <tr>
+            <td x-text="item.batch_year"></td>
+            <td x-text="item.semester"></td>
+            <td x-text="item.batch_avg_gpa"></td>
+            <td x-text="item.student_count || 0"></td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+
+    <div x-show="!loading && !error && batchGpaData.length === 0 && selectedSemester" class="message">
+  No data found for the selected batch and semester.
+</div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
